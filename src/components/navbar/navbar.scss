@@ -1,0 +1,46 @@
+@import '../../base-scss/abstracts/variables';
+@import '../../base-scss/abstracts/mixins';
+
+
+.navbar {
+    width: 100%;
+    height: 5rem;
+    left: 0;
+    top: 0;
+    background-color: $color-primary-1;
+    position: fixed;
+
+
+    &__logo {
+        display: table;
+        height: 100%;
+        width: 7%;
+        padding: 0 .5rem;
+        float: left; 
+        cursor: pointer;
+
+        @include hoverNavbarOption;
+    }
+
+    &__option {
+        display: table;
+        height: 100%;
+        width: 7%;
+        padding: 0 .5rem;
+        cursor: pointer;
+        float: left;
+
+        @include hoverNavbarOption;
+        
+        &--authorization {
+            float: right;
+        }
+    }
+
+    &__content {
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+        font-size: 2rem;
+    }
+}
