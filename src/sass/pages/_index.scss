@@ -1,8 +1,6 @@
-@import './base-scss/abstracts/variables';
-
 @font-face {
   font-family: 'Segoe UI';
-  src: local('Segoe UI'), url('./fonts/Segoe UI.ttf') format('ttf')
+  src: local('Segoe UI'), url('../../fonts/Segoe UI.ttf') format('ttf')
 }
 
 * {
