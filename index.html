@@ -133,12 +133,13 @@
           homeScreen.innerHTML = '';
         });
 
-        loginHandler.addEventListener('click', () => {
+        loginHandler.addEventListener('click', event => {
+          event.preventDefault()
 
           let login = document.getElementById('loginUserName').value;
           let password = document.getElementById('loginPasswordInput').value;
-
-          fetch('http://localhost:5000/api/authorization/login', {
+          try{
+            fetch('https://localhost:5001/api/authorization/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -150,24 +151,27 @@
           })
           .then(response => {
             if (response.status !== 200) {
-              throw new Error(response.statusText);
+              throw new Error(response.statusText)
             } else {
-              response.json();
+              return response.json()
             }
           })
-            .then(data => {
-              token = data.token;
-              $("#login-close-btn").click();
-              registerBtn.style.display = 'none';
-              loginBtn.style.display = 'none';
-              logoutBtn.style.display = 'block';
-              
-              homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(token).unique_name + '!</div>';
-            })
-            .catch(error => {
-              console.log(error)
-              homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
-            })
+          .then(data => {
+            token = data.token;
+            $("#login-close-btn").click();
+            registerBtn.style.display = 'none';
+            loginBtn.style.display = 'none';
+            logoutBtn.style.display = 'block';
+            
+            homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(token).unique_name + '!</div>';
+          })
+          .catch(error => {
+            console.error(error)
+            homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+          });
+          } catch(e){
+            alert(e)
+          }
         });
 
         function parseJwt (token) {
