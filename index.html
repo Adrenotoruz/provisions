@@ -110,7 +110,6 @@
       //TODO: Wersja testowa, do refactoringu
 
       window.addEventListener('load', () => {
-        let token = null;
 
         let registerBtn = document.getElementById('register-link');
         let loginBtn = document.getElementById('login-link');
@@ -121,12 +120,15 @@
 
         let homeScreen = document.getElementById('home-screen');
 
-        if (token === null) {
+        if (localStorage.getItem('token') === null) {
           logoutBtn.style.display = 'none';
+        } else {
+          loginBtn.style.display = 'none';
+          registerBtn.style.display = 'none';
         }
 
         logoutBtn.addEventListener('click', () => {
-          token = null;
+          localStorage.removeItem('token');
           registerBtn.style.display = 'block';
           loginBtn.style.display = 'block';
           logoutBtn.style.display = 'none';
@@ -134,19 +136,19 @@
         });
 
         loginHandler.addEventListener('click', event => {
-          event.preventDefault()
+          event.preventDefault();
 
           let login = document.getElementById('loginUserName').value;
           let password = document.getElementById('loginPasswordInput').value;
           try{
-            fetch('https://localhost:5001/api/authorization/login', {
+            fetch('http://localhost:5000/api/authorization/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              "username": login,
-              "password": password
+              'username': login,
+              'password': password
             })
           })
           .then(response => {
@@ -157,13 +159,13 @@
             }
           })
           .then(data => {
-            token = data.token;
+            localStorage.setItem('token', data.token);
             $("#login-close-btn").click();
             registerBtn.style.display = 'none';
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'block';
             
-            homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(token).unique_name + '!</div>';
+            homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(data.token).unique_name + '!</div>';
           })
           .catch(error => {
             console.error(error)
@@ -173,6 +175,42 @@
             alert(e)
           }
         });
+
+        registerHandler.addEventListener('click', event => {
+          event.preventDefault();
+
+          let login = document.getElementById('registerUserName').value;
+          let password = document.getElementById('registerPasswordInput').value;
+          let email = document.getElementById('registerEmail').value;
+          let passwordConfirm = document.getElementById('registerPasswordConfirmInput').value;
+
+          fetch('http://localhost:5000/api/authorization/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                'username': login,
+                'password': password,
+                'passwordConfirm': passwordConfirm,
+                'email': email
+              })
+            })
+            .then(response => {
+              if(response.status !== 200) {
+                throw new Error(response.statusText);
+              } else {
+                return response.json();
+              }
+            })
+            .then(data => {
+              homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+            })
+            .catch(error => {
+              console.error(error);
+              homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            })
+        })
 
         function parseJwt (token) {
           var base64Url = token.split('.')[1];
