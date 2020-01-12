@@ -65,6 +65,41 @@
       </div>
 
       <!-- Modal -->
+      <div class="modal fade" id="addProvisionModal" tabindex="-1" role="dialog" aria-labelledby="addProvisionModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addProvisionModal">Dodawanie nowego postanowienia</h5>
+              <button type="button" class="close" data-dismiss="modal" id="addProvision-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="login-form">
+                <div class="form-group">
+                  <label for="loginUserName">Nazwa postanowienia</label>
+                  <input type="text" class="form-control" id="provisionInput">
+                </div>
+                <div class="form-group">
+                  <label for="startDateInput">Data startu</label>
+                  <input type="text" class="form-control" id="startDateInput">
+                </div>
+                <div class="form-group">
+                  <label for="endDateInput">Data zakończenia</label>
+                  <input type="text" class="form-control" id="endDateInput">
+                </div>
+                <div class="form-group">
+                  <label for="provisionDescription">Opis postanowienia</label>
+                  <input type="text" class="form-control" id="provisionDescription">
+                </div>
+                <button type="submit" class="btn btn-primary" id="add-provision-btn">Dodaj</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
       <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -98,7 +133,7 @@
           </div>
         </div>
       </div>
-      <div id="home-screen">
+      <div id="message-screen">
 
       </div>
 
@@ -108,7 +143,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script>
-
+      const apiUrl = 'http://localhost:5000';
       //TODO: Wersja testowa, do refactoringu
 
       window.addEventListener('load', () => {
@@ -120,7 +155,9 @@
         let loginHandler = document.getElementById('login-submit');
         let registerHandler = document.getElementById('register-submit');
 
-        let homeScreen = document.getElementById('home-screen');
+        let homeScreen = document.getElementById('message-screen');
+
+        let addProvisionHandler = document.getElementById('add-provision-btn');
 
         if (localStorage.getItem('token') === null) {
           logoutBtn.style.display = 'none';
@@ -143,7 +180,7 @@
           let login = document.getElementById('loginUserName').value;
           let password = document.getElementById('loginPasswordInput').value;
           try{
-            fetch('http://localhost:5000/api/authorization/login', {
+            fetch(apiUrl+'/api/authorization/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -186,7 +223,7 @@
           let email = document.getElementById('registerEmail').value;
           let passwordConfirm = document.getElementById('registerPasswordConfirmInput').value;
 
-          fetch('http://localhost:5000/api/authorization/register', {
+          fetch(apiUrl+'/api/authorization/register', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -212,6 +249,40 @@
               console.error(error);
               homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
+        })
+
+        addProvisionHandler.addEventListener('click', event => {
+          event.preventDefault();
+
+          let provisionName = document.getElementById('provisionInput').value;
+          let provisionStartDate = document.getElementById('startDateInput').value;
+          let provisionEndDate = document.getElementById('endDateInput').value;
+          let provisionDescription = document.getElementById('provisionDescription').value;
+          let messageScreen = document.getElementById('message-screen');
+
+          fetch(apiUrl+'/api/provisions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              'name': provisionName,
+              'startDate': provisionStartDate,
+              'endDate': provisionEndDate,
+              'description': provisionDescription === null ? '' : provisionDescription
+            })
+            .then(response => {
+              if(response.status !== 200) {
+                throw new Error(response.statusText);
+              } else {
+                return response.json()
+              }
+            })
+            .then(data => {
+              messageScreen.style.display = 'block';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+            })
+          })
         })
 
         function parseJwt (token) {
