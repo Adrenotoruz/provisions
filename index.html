@@ -83,11 +83,11 @@
                 </div>
                 <div class="form-group">
                   <label for="startDateInput">Data startu</label>
-                  <input type="datetime-local" class="form-control" value="<script>new Date().toISOString().substr(0, 10)</script>" id="startDateInput">
+                  <input type="datetime-local" class="form-control" value="2020-06-13T13:00" id="startDateInput">
                 </div>
                 <div class="form-group">
                   <label for="endDateInput">Data zakończenia</label>
-                  <input type="datetime-local" class="form-control" value="<script>new Date().toISOString().substr(0, 10)</script>" id="endDateInput">
+                  <input type="datetime-local" class="form-control" value="2021-06-13T13:00" id="endDateInput">
                 </div>
                 <div class="form-group">
                   <label for="provisionDescription">Opis postanowienia</label>
@@ -106,7 +106,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="registerModalLabel">Rejestracja</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close" id="register-close-btn" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -138,7 +138,7 @@
 
       </div>
 
-      <div class="row" id="home-screen">
+      <div id="home-screen">
 
       </div>
 
@@ -171,6 +171,7 @@
 
         let provisionsList = document.getElementById('provisions-link');
         let daysList = document.getElementById('days-link');
+        let messageScreen = document.getElementById('message-screen');
 
         if (localStorage.getItem('token') === null) {
           logoutBtn.style.display = 'none';
@@ -227,11 +228,11 @@
             provisionsList.style.display = 'block';
             daysList.style.display = 'block';
             
-            homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(data.token).unique_name + '!</div>';
+            messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">Witaj ' + parseJwt(data.token).unique_name + '!</div>';
           })
           .catch(error => {
             console.error(error)
-            homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
           });
           } catch(e){
             alert(e)
@@ -266,11 +267,12 @@
               }
             })
             .then(data => {
-              homeScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+              $("#register-close-btn").click();
             })
             .catch(error => {
               console.error(error);
-              homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
         })
 
@@ -328,7 +330,7 @@
             homeScreen.style.display = 'block';
           })
           .catch(error => {
-            homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
           })
         })
 
@@ -339,7 +341,6 @@
           let provisionStartDate = document.getElementById('startDateInput').value;
           let provisionEndDate = document.getElementById('endDateInput').value;
           let provisionDescription = document.getElementById('provisionDescription').value;
-          let messageScreen = document.getElementById('message-screen');
 
           fetch(apiUrl+'/api/provisions/add', {
             method: 'POST',
@@ -364,10 +365,12 @@
             .then(data => {
               messageScreen.style.display = 'block';
               messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+              $("#addProvision-close-btn").click();
+              provisionsList.click();
             })
             .catch(error => {
               console.error(error);
-              homeScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
           });
         })
