@@ -38,6 +38,8 @@
         </div>
       </nav>
 
+      
+
       <!-- Modal -->
       <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -101,6 +103,110 @@
       </div>
 
       <!-- Modal -->
+      <div class="modal fade" id="addDaysModal" tabindex="-1" role="dialog" aria-labelledby="addDaysModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addDaysModal">Dodawanie nowego dnia</h5>
+              <button type="button" class="close" data-dismiss="modal" id="addDay-close-btn" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="login-form">
+                <div class="form-group">
+                  <label for="provisionSelection">Nazwa postanowienia</label>
+                  <select id="provisionSelection">
+                    <script>
+                      window.addEventListener('load', () => {
+                        let messageScreen = document.getElementById('message-screen');
+                        fetch(apiUrl+'/api/provisions/get',{
+                          method: 'GET',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '+localStorage.getItem('token')
+                          }
+                        })
+                        .then(response => {
+                          console.log(response);
+                          if(response.status !== 200) {
+                            throw new Error(response.statusText);
+                          } else {
+                            return response.json();
+                          }
+                        })
+                        .then(data => {
+                          let provisionsSelection = document.getElementById("provisionSelection");
+                          for(let i=0; i<data.length; i++) {
+                            let option = document.createElement("option");
+                            option.value = data[i].id;
+                            option.innerHTML = data[i].name; 
+                            provisionsSelection.appendChild(option)
+                          }
+                        })
+                        .catch(error => {
+                          console.error(error)
+                          messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+                        });
+
+                      });
+                    </script>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="dayDateInput">Data</label>
+                  <input type="datetime-local" class="form-control" value="2020-06-13T13:00" id="dayDateInput">
+                </div>
+                <div class="form-group">
+                  <label for="StatusInput">Status wykonania</label>
+                  <select id="StatusInput">
+                    <script>
+                    window.addEventListener('load', () => {
+                      let messageScreen = document.getElementById('message-screen');
+                        fetch(apiUrl+'/api/status/get',{
+                          method: 'GET',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '+localStorage.getItem('token')
+                          }
+                        })
+                        .then(response => {
+                          if(response.status !== 200) {
+                            throw new Error(response.statusText);
+                          } else {
+                            return response.json();
+                          }
+                        })
+                        .then(data => {
+                          let statusSelection = document.getElementById("StatusInput");
+                          for(let i=0; i<data.length; i++) {
+                            let option = document.createElement("option");
+                            option.value = data[i].state;
+                            option.innerHTML = data[i].name; 
+                            statusSelection.appendChild(option)
+                          }
+                        })
+                        .catch(error => {
+                          console.error(error)
+                          messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+                        });
+
+                      });
+                    </script>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="dayDescription">Opis</label>
+                  <input type="text" class="form-control" id="dayDescription">
+                </div>
+                <button type="submit" class="btn btn-primary" id="add-day-btn">Dodaj</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
       <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -153,7 +259,7 @@
     <script>
       //TODO: Wersja testowa, do refactoringu
 
-      const apiUrl = 'http://localhost:5000';
+      const apiUrl = 'http://83.10.71.94:5000';
 
       window.addEventListener('load', () => {
 
@@ -307,7 +413,36 @@
             </table>
             <button type="submit" class="btn btn-primary" id="add-new-provision" data-toggle="modal" data-target="#addProvisionModal">Dodaj</button>
             </div>
-            </div>`;
+            </div>`
+      
+
+              $('#provisions-table').DataTable({
+                  "language": {
+                      "sProcessing": "Przetwarzanie...",
+                      "sLengthMenu": "Pokaż _MENU_ pozycji",
+                      "sZeroRecords": "Nie znaleziono pasujących pozycji",
+                      "sInfoThousands": " ",
+                      "sInfo": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                      "sInfoEmpty": "Pozycji 0 z 0 dostępnych",
+                      "sInfoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                      "sInfoPostFix": "",
+                      "sSearch": "Szukaj:",
+                      "sUrl": "",
+                      "oPaginate": {
+                          "sFirst": "Pierwsza",
+                          "sPrevious": "Poprzednia",
+                          "sNext": "Następna",
+                          "sLast": "Ostatnia"
+                      },
+                      "sEmptyTable": "Brak danych",
+                      "sLoadingRecords": "Wczytywanie...",
+                      "oAria": {
+                          "sSortAscending": ": aktywuj, by posortować kolumnę rosnąco",
+                          "sSortDescending": ": aktywuj, by posortować kolumnę malejąco"
+                      }
+                  }
+              });
+          
 
             let provisionsTableBody = document.getElementById('provisions-tbody');
             for(i=0; i<data.length; i++) {
@@ -319,6 +454,91 @@
               name.innerHTML = data[i].name;
               startDate.innerHTML = data[i].startDate;
               endDate.innerHTML = data[i].endDate;
+              description.innerHTML = data[i].description;
+              tr.appendChild(name);
+              tr.appendChild(startDate);
+              tr.appendChild(endDate);
+              tr.appendChild(description);
+
+              provisionsTableBody.appendChild(tr);
+            }
+            homeScreen.style.display = 'block';
+          })
+          .catch(error => {
+            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+          })
+        })
+
+        daysList.addEventListener('click', event => {
+          event.preventDefault();
+
+          fetch(apiUrl+'/api/days/get',{
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer '+localStorage.getItem('token')
+            }
+          })
+          .then(response => {
+            if(response.status !== 200) {
+              throw new Error(response.statusText);
+            } else {
+              return response.json();
+            }
+          })
+          .then(data => {
+            homeScreen.innerHTML = `<div class="row"><div class="col-xs-12 my-3 col-sm-8 offset-sm-2">
+              <table id="days-table" class="table table-striped table-bordered" style="width: 100%">
+              <thead id='days-thead'>
+                <th>Nazwa postanowienia</th>
+                <th>Data rozpoczęcia</th>
+                <th>Status wykonania</th>
+                <th>Opis</th>
+              </thead>
+              <tbody id='provisions-tbody'>
+              </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary" id="add-new-day" data-toggle="modal" data-target="#addDaysModal">Dodaj</button>
+            </div>
+            </div>`
+            
+            $('#provisions-table').DataTable({
+                    "language": {
+                        "sProcessing": "Przetwarzanie...",
+                        "sLengthMenu": "Pokaż _MENU_ pozycji",
+                        "sZeroRecords": "Nie znaleziono pasujących pozycji",
+                        "sInfoThousands": " ",
+                        "sInfo": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                        "sInfoEmpty": "Pozycji 0 z 0 dostępnych",
+                        "sInfoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                        "sInfoPostFix": "",
+                        "sSearch": "Szukaj:",
+                        "sUrl": "",
+                        "oPaginate": {
+                            "sFirst": "Pierwsza",
+                            "sPrevious": "Poprzednia",
+                            "sNext": "Następna",
+                            "sLast": "Ostatnia"
+                        },
+                        "sEmptyTable": "Brak danych",
+                        "sLoadingRecords": "Wczytywanie...",
+                        "oAria": {
+                            "sSortAscending": ": aktywuj, by posortować kolumnę rosnąco",
+                            "sSortDescending": ": aktywuj, by posortować kolumnę malejąco"
+                        }
+                    }
+                });
+            
+            let provisionsTableBody = document.getElementById('provisions-tbody');
+            for(i=0; i<data.length; i++) {
+              let tr = document.createElement('tr');
+              let name = document.createElement('td');
+              let startDate = document.createElement('td');
+              let endDate = document.createElement('td');
+              let description = document.createElement('td');
+              name.innerHTML = data[i].provisionName;
+              startDate.innerHTML = data[i].statusName;
+              endDate.innerHTML = data[i].date;
               description.innerHTML = data[i].description;
               tr.appendChild(name);
               tr.appendChild(startDate);
