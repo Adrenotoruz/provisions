@@ -279,6 +279,8 @@
         let daysList = document.getElementById('days-link');
         let messageScreen = document.getElementById('message-screen');
 
+        let addDayHandler = document.getElementById('add-day-btn');
+
         if (localStorage.getItem('token') === null) {
           logoutBtn.style.display = 'none';
           homeScreen.style.display = 'none';
@@ -554,6 +556,49 @@
           })
         })
 
+        addDayHandler.addEventListener('click', event => {
+          event.preventDefault();
+
+          let provisionId = document.getElementById('provisionSelection');
+          provisionId = provisionId.options[provisionId.selectedIndex].value
+          let dayDate = document.getElementById('dayDateInput').value;
+          let statusName = document.getElementById('StatusInput');
+          statusName.options[statusName.selectedIndex].value
+          let dayDescription= document.getElementById('dayDescription').value;
+
+          fetch(apiUrl+'/api/days/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer '+localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                'provisionId': provisionId,
+                'date': dayDate,
+                'statusName': statusName,
+                'description': dayDescription === null ? '' : dayDescription
+              })
+            })
+            .then(response => {
+              if(response.status !== 200) {
+                throw new Error(response.statusText);
+              } else {
+                return response.json()
+              }
+            })
+            .then(data => {
+              messageScreen.style.display = 'block';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
+              $("#addProvision-close-btn").click();
+              provisionsList.click();
+            })
+            .catch(error => {
+              console.error(error);
+              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            })
+          });
+        })
+
         addProvisionHandler.addEventListener('click', event => {
           event.preventDefault();
 
@@ -593,7 +638,6 @@
               messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
           });
-        })
 
 
 
