@@ -8,6 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="datatables/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link id="dark-theme" href="https://bootswatch.com/4/darkly/bootstrap.css" rel="stylesheet" />
 
     <title>Provisions</title>
   </head>
@@ -36,6 +37,7 @@
             </li>
           </ul>
         </div>
+        <button class="btn btn-secondary" id="blind-btn">Zmień motyw</button>
       </nav>
 
       
@@ -85,11 +87,11 @@
                 </div>
                 <div class="form-group">
                   <label for="startDateInput">Data startu</label>
-                  <input type="datetime-local" class="form-control" value="2020-06-13T13:00" id="startDateInput">
+                  <input type="datetime-local" class="form-control" value="2020-06-15T13:00" id="startDateInput">
                 </div>
                 <div class="form-group">
                   <label for="endDateInput">Data zakończenia</label>
-                  <input type="datetime-local" class="form-control" value="2021-06-13T13:00" id="endDateInput">
+                  <input type="datetime-local" class="form-control" value="2021-06-16T13:00" id="endDateInput">
                 </div>
                 <div class="form-group">
                   <label for="provisionDescription">Opis postanowienia</label>
@@ -116,7 +118,7 @@
               <form id="login-form">
                 <div class="form-group">
                   <label for="provisionSelection">Nazwa postanowienia</label>
-                  <select id="provisionSelection">
+                  <select class="form-control" id="provisionSelection">
                     <script>
                       window.addEventListener('load', () => {
                         let messageScreen = document.getElementById('message-screen');
@@ -140,13 +142,13 @@
                           for(let i=0; i<data.length; i++) {
                             let option = document.createElement("option");
                             option.value = data[i].id;
-                            option.innerHTML = data[i].name; 
+                            option.innerHTML = data[i].name;
                             provisionsSelection.appendChild(option)
                           }
                         })
                         .catch(error => {
                           console.error(error)
-                          messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+                          //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
                         });
 
                       });
@@ -155,11 +157,11 @@
                 </div>
                 <div class="form-group">
                   <label for="dayDateInput">Data</label>
-                  <input type="datetime-local" class="form-control" value="2020-06-13T13:00" id="dayDateInput">
+                  <input type="datetime-local" class="form-control" value="2020-06-15T13:00" id="dayDateInput">
                 </div>
                 <div class="form-group">
                   <label for="StatusInput">Status wykonania</label>
-                  <select id="StatusInput">
+                  <select class="form-control" id="StatusInput">
                     <script>
                     window.addEventListener('load', () => {
                       let messageScreen = document.getElementById('message-screen');
@@ -188,7 +190,7 @@
                         })
                         .catch(error => {
                           console.error(error)
-                          messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+                          //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
                         });
 
                       });
@@ -255,14 +257,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="datatables/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="datatables/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-    <script src="tableInitializer.js"></script>
+    <!-- <script src="tableInitializer.js"></script> -->
     <script>
       //TODO: Wersja testowa, do refactoringu
 
-      const apiUrl = 'http://83.10.71.94:5000';
+      const apiUrl = 'http://localhost:5000';
 
       window.addEventListener('load', () => {
 
+        let blindBtn = document.getElementById('blind-btn');
         let addNewProvision = null;
         let registerBtn = document.getElementById('register-link');
         let loginBtn = document.getElementById('login-link');
@@ -271,7 +274,7 @@
         let loginHandler = document.getElementById('login-submit');
         let registerHandler = document.getElementById('register-submit');
 
-        let homeScreen = document.getElementById('message-screen');
+        let homeScreen = document.getElementById('home-screen');
 
         let addProvisionHandler = document.getElementById('add-provision-btn');
 
@@ -283,15 +286,31 @@
 
         if (localStorage.getItem('token') === null) {
           logoutBtn.style.display = 'none';
-          homeScreen.style.display = 'none';
           provisionsList.style.display = 'none';
           daysList.style.display = 'none';
+          homeScreen.innerHTML = "<h2>Miejsce na jakiś fajny content, ale jeszcze nie wiemy jaki :/</h2>"
         } else {
           loginBtn.style.display = 'none';
           registerBtn.style.display = 'none';
           provisionsList.style.display = 'block';
           daysList.style.display = 'block';
         }
+
+        if (localStorage.getItem('blind') === null) {
+          $('link[href="https://bootswatch.com/4/darkly/bootstrap.css"]').prop('disabled', true);
+        } else {
+          $('link[href="https://bootswatch.com/4/darkly/bootstrap.css"]').prop('disabled', false);
+        }
+
+        blindBtn.addEventListener('click', () => {
+          if (localStorage.getItem('blind') === null) {
+            localStorage.setItem('blind', true);
+            $('link[href="https://bootswatch.com/4/darkly/bootstrap.css"]').prop('disabled', true);
+          } else {
+            localStorage.removeItem('blind', true);
+            $('link[href="https://bootswatch.com/4/darkly/bootstrap.css"]').prop('disabled', false);
+          }
+        });
 
         logoutBtn.addEventListener('click', () => {
           localStorage.removeItem('token');
@@ -301,7 +320,7 @@
           homeScreen.innerHTML = '';
           provisionsList.style.display = 'none';
           daysList.style.display = 'none';
-          homeScreen.innerHTML = '';
+          messageScreen.innerHTML = '';
         });
 
         loginHandler.addEventListener('click', event => {
@@ -380,7 +399,7 @@
             })
             .catch(error => {
               console.error(error);
-              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
         })
 
@@ -403,6 +422,7 @@
           })
           .then(data => {
             homeScreen.innerHTML = `<div class="row"><div class="col-xs-12 my-3 col-sm-8 offset-sm-2">
+            <h4>Lista postanowień</h4>
               <table id="provisions-table" class="table table-striped table-bordered" style="width: 100%">
               <thead id='provisions-thead'>
                 <th>Nazwa</th>
@@ -416,9 +436,29 @@
             <button type="submit" class="btn btn-primary" id="add-new-provision" data-toggle="modal" data-target="#addProvisionModal">Dodaj</button>
             </div>
             </div>`
-      
+          
 
-              $('#provisions-table').DataTable({
+            let provisionsTableBody = document.getElementById('provisions-tbody');
+            for(i=0; i<data.length; i++) {
+              let tr = document.createElement('tr');
+              let name = document.createElement('td');
+              let startDate = document.createElement('td');
+              let endDate = document.createElement('td');
+              let description = document.createElement('td');
+              name.innerHTML = data[i].name;
+              startDate.innerHTML = data[i].startDate;
+              endDate.innerHTML = data[i].endDate;
+              description.innerHTML = data[i].description;
+              tr.appendChild(name);
+              tr.appendChild(startDate);
+              tr.appendChild(endDate);
+              tr.appendChild(description);
+
+              provisionsTableBody.appendChild(tr);
+            }
+            homeScreen.style.display = 'block';
+
+            $('#provisions-table').DataTable({
                   "language": {
                       "sProcessing": "Przetwarzanie...",
                       "sLengthMenu": "Pokaż _MENU_ pozycji",
@@ -444,27 +484,6 @@
                       }
                   }
               });
-          
-
-            let provisionsTableBody = document.getElementById('provisions-tbody');
-            for(i=0; i<data.length; i++) {
-              let tr = document.createElement('tr');
-              let name = document.createElement('td');
-              let startDate = document.createElement('td');
-              let endDate = document.createElement('td');
-              let description = document.createElement('td');
-              name.innerHTML = data[i].name;
-              startDate.innerHTML = data[i].startDate;
-              endDate.innerHTML = data[i].endDate;
-              description.innerHTML = data[i].description;
-              tr.appendChild(name);
-              tr.appendChild(startDate);
-              tr.appendChild(endDate);
-              tr.appendChild(description);
-
-              provisionsTableBody.appendChild(tr);
-            }
-            homeScreen.style.display = 'block';
           })
           .catch(error => {
             messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
@@ -490,11 +509,12 @@
           })
           .then(data => {
             homeScreen.innerHTML = `<div class="row"><div class="col-xs-12 my-3 col-sm-8 offset-sm-2">
+              <h4>Lista dni</h4>
               <table id="days-table" class="table table-striped table-bordered" style="width: 100%">
               <thead id='days-thead'>
                 <th>Nazwa postanowienia</th>
-                <th>Data rozpoczęcia</th>
                 <th>Status wykonania</th>
+                <th>Data rozpoczęcia</th>
                 <th>Opis</th>
               </thead>
               <tbody id='provisions-tbody'>
@@ -504,7 +524,35 @@
             </div>
             </div>`
             
-            $('#provisions-table').DataTable({
+            let provisionsTableBody = document.getElementById('provisions-tbody');
+            for(i=0; i<data.length; i++) {
+              let tr = document.createElement('tr');
+              let name = document.createElement('td');
+              let startDate = document.createElement('td');
+              let endDate = document.createElement('td');
+              let description = document.createElement('td');
+              name.innerHTML = data[i].provisionName;
+              startDate.innerHTML = data[i].statusName;
+              endDate.innerHTML = data[i].date;
+              description.innerHTML = data[i].description;
+                                          if(data[i].statusName === "Wykonano") {
+                                            startDate.style.color = "green";
+                            } else if (data[i].statusName === "Nie wykonano") {
+                              startDate.style.color = "red";
+                            } else if (data[i].statusName === "Nie obowiązuje") {
+                              startDate.style.color = "gray";
+                            } else if (data[i].statusName === "Wykonano warunkowo") {
+                              startDate.style.color = "orange";
+                            }
+              tr.appendChild(name);
+              tr.appendChild(startDate);
+              tr.appendChild(endDate);
+              tr.appendChild(description);
+
+              provisionsTableBody.appendChild(tr);
+            }
+
+            $('#days-table').DataTable({
                     "language": {
                         "sProcessing": "Przetwarzanie...",
                         "sLengthMenu": "Pokaż _MENU_ pozycji",
@@ -530,29 +578,10 @@
                         }
                     }
                 });
-            
-            let provisionsTableBody = document.getElementById('provisions-tbody');
-            for(i=0; i<data.length; i++) {
-              let tr = document.createElement('tr');
-              let name = document.createElement('td');
-              let startDate = document.createElement('td');
-              let endDate = document.createElement('td');
-              let description = document.createElement('td');
-              name.innerHTML = data[i].provisionName;
-              startDate.innerHTML = data[i].statusName;
-              endDate.innerHTML = data[i].date;
-              description.innerHTML = data[i].description;
-              tr.appendChild(name);
-              tr.appendChild(startDate);
-              tr.appendChild(endDate);
-              tr.appendChild(description);
-
-              provisionsTableBody.appendChild(tr);
-            }
             homeScreen.style.display = 'block';
           })
           .catch(error => {
-            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
           })
         })
 
@@ -587,17 +616,16 @@
               }
             })
             .then(data => {
-              messageScreen.style.display = 'block';
+              //messageScreen.style.display = 'block';
               messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
               $("#addProvision-close-btn").click();
-              provisionsList.click();
+              daysList.click();
             })
             .catch(error => {
               console.error(error);
-              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
           });
-        })
 
         addProvisionHandler.addEventListener('click', event => {
           event.preventDefault();
@@ -635,10 +663,10 @@
             })
             .catch(error => {
               console.error(error);
-              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
             })
           });
-
+        })
 
 
         function parseJwt (token) {
