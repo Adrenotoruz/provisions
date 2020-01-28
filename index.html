@@ -227,19 +227,19 @@
               <form id="register-form">
                 <div class="form-group">
                   <label for="registerUserName">Nazwa użytkownika</label>
-                  <input type="login" class="form-control" id="registerUserName">
+                  <input type="text" class="form-control" id="registerUserName" minlength="5" maxlength="25" required>
                 </div>
                 <div class="form-group">
                   <label for="registerEmail">Email</label>
-                  <input type="login" class="form-control" id="registerEmail">
+                  <input type="text" class="form-control" id="registerEmail" required>
                 </div>
                 <div class="form-group">
                   <label for="registerPasswordInput">Hasło</label>
-                  <input type="password" class="form-control" id="registerPasswordInput">
+                  <input type="password" class="form-control" id="registerPasswordInput" minlength="8" maxlength="25" required>
                 </div>
                 <div class="form-group">
                   <label for="registerPasswordConfirmInput">Powtórz hasło</label>
-                  <input type="password" class="form-control" id="registerPasswordConfirmInput">
+                  <input type="password" class="form-control" id="registerPasswordConfirmInput" minlength="8" maxlength="25" required>
                 </div>
                 <button type="submit" class="btn btn-primary" id="register-submit">Rejestracja</button>
               </form>
@@ -267,6 +267,15 @@
       //TODO: Wersja testowa, do refactoringu
 
       const apiUrl = 'http://localhost:5000';
+
+      window.addEventListener('beforeunload', () => {
+        if (localStorage.getItem('provisionsSet') !== null) {
+          localStorage.removeItem('provisionsSet');
+        }
+        if (localStorage.getItem('statusSet') !== null) {
+          localStorage.removeItem('statusSet');
+        }
+      });
 
       window.addEventListener('load', () => {
 
@@ -368,7 +377,8 @@
           })
           .catch(error => {
             console.error(error)
-            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+            messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">Nieprawidłowy login lub hasło</div>';
+            $("#login-close-btn").click();
           });
           } catch(e){
             alert(e)
@@ -397,7 +407,16 @@
             })
             .then(response => {
               if(response.status !== 200) {
-                throw new Error(response.statusText);
+                response.json().then(error => {
+                  var errMsg = '<b>Nie udało sie utworzyć konta</b></br>';
+                  for(var key in error) {
+                    if (error.hasOwnProperty(key)) {
+                      errMsg += error[key][0] + '</br>';
+                    }
+                  }
+                  messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">'+errMsg+'</div>';
+                })
+                throw new Error(response.status);
               } else {
                 return response.json();
               }
@@ -407,8 +426,8 @@
               $("#register-close-btn").click();
             })
             .catch(error => {
-              console.error(error);
-              //messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">' + error + '!</div>';
+              messageScreen.innerHTML = '<div class="m-2 alert alert-danger" role="alert">Wystąpił nieznany błąd, przepraszamy za utrudnienia.</div>';
+              $("#register-close-btn").click();
             })
         })
 
@@ -526,39 +545,39 @@
                 <th>Data rozpoczęcia</th>
                 <th>Opis</th>
               </thead>
-              <tbody id='provisions-tbody'>
+              <tbody id='days-tbody'>
               </tbody>
             </table>
             <button type="submit" class="btn btn-primary" id="add-new-day" data-toggle="modal" data-target="#addDaysModal">Dodaj</button>
             </div>
             </div>`
             
-            let provisionsTableBody = document.getElementById('provisions-tbody');
+            let daysTableBody = document.getElementById('days-tbody');
             for(i=0; i<data.length; i++) {
               let tr = document.createElement('tr');
               let name = document.createElement('td');
-              let startDate = document.createElement('td');
-              let endDate = document.createElement('td');
+              let statusName = document.createElement('td');
+              let date = document.createElement('td');
               let description = document.createElement('td');
               name.innerHTML = data[i].provisionName;
-              startDate.innerHTML = formatDate(data[i].startDate);
-              endDate.innerHTML = formatDate(data[i].endDate);
+              statusName.innerHTML = data[i].statusName;
+              date.innerHTML = formatDate(data[i].date);
               description.innerHTML = data[i].description;
                                           if(data[i].statusName === "Wykonano") {
-                                            startDate.style.color = "green";
+                                            statusName.style.color = "green";
                             } else if (data[i].statusName === "Nie wykonano") {
-                              startDate.style.color = "red";
+                              statusName.style.color = "red";
                             } else if (data[i].statusName === "Nie obowiązuje") {
-                              startDate.style.color = "gray";
+                              statusName.style.color = "gray";
                             } else if (data[i].statusName === "Wykonano warunkowo") {
-                              startDate.style.color = "orange";
+                              statusName.style.color = "orange";
                             }
               tr.appendChild(name);
-              tr.appendChild(startDate);
-              tr.appendChild(endDate);
+              tr.appendChild(statusName);
+              tr.appendChild(date);
               tr.appendChild(description);
 
-              provisionsTableBody.appendChild(tr);
+              daysTableBody.appendChild(tr);
             }
 
             $('#days-table').DataTable({
@@ -627,7 +646,7 @@
             .then(data => {
               //messageScreen.style.display = 'block';
               messageScreen.innerHTML = '<div class="m-2 alert alert-success" role="alert">' + data.message + '</div>';
-              $("#addProvision-close-btn").click();
+              $("#addDay-close-btn").click();
               daysList.click();
             })
             .catch(error => {
