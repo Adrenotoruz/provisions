@@ -710,7 +710,7 @@
         function formatDate(date) {
           try {
             if (date) {
-              return date.replace(/T/g, ' ');
+              return (date.replace(/T/g, ' ')).replace(/\..*$/, '');             
             }
             return '';  
           } catch (e) {
