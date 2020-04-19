@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import Navbar from '../components/Navbar';
-import LogIn from '../components/LogIn';
-import Registration from '../components/Registration';
+import Navbar from '../components/navbar/navbar.component';
+import LogIn from '../pages/LogIn/LogIn.component';
+import Registration from '../pages/Registration/Registration.component';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
+import AppContainer from './App.styles'
 
 const Home = () => <div></div>;
 
@@ -12,14 +14,14 @@ class App extends Component {
 
     return (
       <Router>
-        <div className="padding-top-medium">
+        <AppContainer>
           <Navbar/>
           <Switch>
             <Route path="/" exact component={Home}/>
             <Route path="/logIn" component={LogIn}/>
             <Route path="/registration" component={Registration}/>
           </Switch>
-        </div>
+        </AppContainer>
       </Router>
       
     )
