@@ -6,6 +6,7 @@ const navbarOption = css`
     height: 100%;
     width: 12.5rem;
     padding: 0 1rem;
+    color: black;
     float: left; 
     cursor: pointer;
     background-image: linear-gradient(150deg,
@@ -15,9 +16,13 @@ const navbarOption = css`
     background-size: 300%;
     transition: all .4s;
     
+    span {
+        transition: all .4s;
+    }
+
     &:hover {
         background-position: 100%;
-
+        
         span {
             transition: all .4s;
             color: #fff;

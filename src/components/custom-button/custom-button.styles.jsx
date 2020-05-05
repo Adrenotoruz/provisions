@@ -11,17 +11,19 @@ const CustomButtonContainer = styled.button`
     border: none;
     width: 90%;
     padding: 1rem 2rem;
-    background-color: #737373;
+    background-color: #606060;
     color: #fff;
-    transition: all .3s;
+    transition-timing-function: linear;
+    transition: all .1s;
 
     &:focus {
         outline: none;
     }
 
     &:hover {
-        background-color: #808080;
-        box-shadow: 0rem .5rem 1rem rgba(0, 0, 0, 0.2);
+        background-color: #434343;
+        color: white;
+        ${'' /* box-shadow: 0rem .5rem 1rem rgba(0, 0, 0, 0.2); */}
         cursor: pointer;
     }
 `;
