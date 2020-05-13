@@ -11,8 +11,8 @@ const CustomButtonContainer = styled.button`
     border: none;
     width: 90%;
     padding: 1rem 2rem;
-    background-color: #606060;
-    color: #fff;
+    background-color: #666;
+    color: #eee;
     transition-timing-function: linear;
     transition: all .1s;
 
@@ -21,9 +21,8 @@ const CustomButtonContainer = styled.button`
     }
 
     &:hover {
-        background-color: #434343;
-        color: white;
-        ${'' /* box-shadow: 0rem .5rem 1rem rgba(0, 0, 0, 0.2); */}
+        background-color: #4d4d4d;
+        color: #eee;
         cursor: pointer;
     }
 `;
