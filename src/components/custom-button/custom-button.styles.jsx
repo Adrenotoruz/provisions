@@ -11,7 +11,7 @@ const CustomButtonContainer = styled.button`
     border: none;
     width: 90%;
     padding: 1rem 2rem;
-    background-color: #666;
+    background-color: #757575;
     color: #eee;
     transition-timing-function: linear;
     transition: all .1s;
@@ -21,7 +21,7 @@ const CustomButtonContainer = styled.button`
     }
 
     &:hover {
-        background-color: #4d4d4d;
+        background-color: #606060;
         color: #eee;
         cursor: pointer;
     }
